@@ -1,5 +1,5 @@
-// FeedMonitor - Background Service Worker
-console.log('FeedMonitor: Background script loaded at:', new Date().toLocaleTimeString());
+// Signal by ELI - Background Service Worker
+console.log('Signal: Background script loaded at:', new Date().toLocaleTimeString());
 
 // Global variables for monitoring
 let monitoringActive = false;
@@ -23,7 +23,7 @@ const PODCAST_INDEX_API_URL = 'https://api.podcastindex.org/api/1.0/search/byter
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
-    console.log('FeedMonitor: Extension installed/updated:', details.reason);
+    console.log('Signal: Extension installed/updated:', details.reason);
     
     // Set up monitoring alarm (check every 5 minutes)
     chrome.alarms.create(monitoringAlarmName, {
@@ -39,14 +39,14 @@ chrome.runtime.onInstalled.addListener((details) => {
         signalActivities: []
     });
     
-    console.log('FeedMonitor: Initialization complete');
+    console.log('Signal: Initialization complete');
 });
 
 // Handle alarm for periodic monitoring
 chrome.alarms.onAlarm.addListener((alarm) => {
-    console.log('FeedMonitor: Alarm received:', alarm.name, 'at', new Date().toLocaleTimeString());
+    console.log('Signal: Alarm received:', alarm.name, 'at', new Date().toLocaleTimeString());
     if (alarm.name === monitoringAlarmName) {
-        console.log('FeedMonitor: Monitoring alarm triggered - checking for mentions');
+        console.log('Signal: Monitoring alarm triggered - checking for mentions');
         checkForMentions();
     }
 });
@@ -54,12 +54,12 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 // Debug: Log all active alarms every 30 seconds
 setInterval(async () => {
     const alarms = await chrome.alarms.getAll();
-    console.log('FeedMonitor: Active alarms:', alarms.map(a => ({name: a.name, when: new Date(a.scheduledTime).toLocaleTimeString()})));
+    console.log('Signal: Active alarms:', alarms.map(a => ({name: a.name, when: new Date(a.scheduledTime).toLocaleTimeString()})));
 }, 30000);
 
 // Message handler
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('FeedMonitor: Message received:', request.action);
+    console.log('Signal: Message received:', request.action);
     
     if (request.action === 'startMonitoring') {
         startMonitoring();
@@ -101,35 +101,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Test RSS access function
 async function testRSSAccess() {
-    console.log('FeedMonitor: Testing RSS access...');
+    console.log('Signal: Testing RSS access...');
     
     try {
         // Test with a simple RSS feed first
         const testUrl = 'https://news.google.com/rss?hl=en&gl=US&ceid=US:en';
-        console.log(`FeedMonitor: Testing RSS URL: ${testUrl}`);
+        console.log(`Signal: Testing RSS URL: ${testUrl}`);
         
         const response = await fetch(testUrl);
-        console.log(`FeedMonitor: Test RSS response status: ${response.status}`);
+        console.log(`Signal: Test RSS response status: ${response.status}`);
         
         if (!response.ok) {
             throw new Error(`RSS test failed: ${response.status}`);
         }
         
         const text = await response.text();
-        console.log(`FeedMonitor: Test RSS response length: ${text.length}`);
-        console.log(`FeedMonitor: Test RSS preview: ${text.substring(0, 300)}...`);
+        console.log(`Signal: Test RSS response length: ${text.length}`);
+        console.log(`Signal: Test RSS preview: ${text.substring(0, 300)}...`);
         
         return { success: true, length: text.length, preview: text.substring(0, 200) };
         
     } catch (error) {
-        console.error('FeedMonitor: RSS test failed:', error);
+        console.error('Signal: RSS test failed:', error);
         return { success: false, error: error.message };
     }
 }
 
 // Debug RSS for specific company
 async function debugRSSForCompany(company) {
-    console.log('FeedMonitor: Starting debug RSS for company:', company.name);
+    console.log('Signal: Starting debug RSS for company:', company.name);
     
     const debugLog = [];
     
@@ -154,7 +154,7 @@ async function debugRSSForCompany(company) {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/rss+xml, application/xml, text/xml',
-                        'User-Agent': 'PR-Buddy-Chrome-Extension/1.0'
+                        'User-Agent': 'Signal-Chrome-Extension/1.0'
                     }
                 });
                 
@@ -208,7 +208,7 @@ async function debugRSSForCompany(company) {
                 if (logs.length > 0) {
                     debugLog.push(`\n📋 Parsing console logs:`);
                     logs.forEach(log => {
-                        if (log.includes('FeedMonitor:')) {
+                        if (log.includes('Signal:')) {
                             debugLog.push(`   ${log}`);
                         }
                     });
@@ -344,31 +344,31 @@ async function startMonitoring() {
         const companies = result.signalCompanies || [];
         
         if (companies.length === 0) {
-            console.log('FeedMonitor: No companies to monitor');
+            console.log('Signal: No companies to monitor');
             return;
         }
         
         const activeCompanies = companies.filter(company => company.isActive);
         if (activeCompanies.length === 0) {
-            console.log('FeedMonitor: No active companies to monitor');
+            console.log('Signal: No active companies to monitor');
             return;
         }
         
         monitoringActive = true;
-        console.log(`FeedMonitor: Started monitoring ${activeCompanies.length} active companies`);
+        console.log(`Signal: Started monitoring ${activeCompanies.length} active companies`);
         
         // Immediately check for mentions
         checkForMentions();
         
     } catch (error) {
-        console.error('FeedMonitor: Error starting monitoring:', error);
+        console.error('Signal: Error starting monitoring:', error);
     }
 }
 
 // Check for mentions function
 async function checkForMentions() {
     try {
-        console.log('FeedMonitor: Checking for new mentions...');
+        console.log('Signal: Checking for new mentions...');
         
         const result = await chrome.storage.local.get(['signalCompanies', 'signalMentions']);
         const companies = result.signalCompanies || [];
@@ -377,18 +377,18 @@ async function checkForMentions() {
         const activeCompanies = companies.filter(company => company.isActive);
         
         if (activeCompanies.length === 0) {
-            console.log('FeedMonitor: No active companies to monitor');
+            console.log('Signal: No active companies to monitor');
             return;
         }
         
         let newMentions = [];
         
         for (const company of activeCompanies) {
-            console.log(`FeedMonitor: Checking mentions for company: ${company.name}`);
+            console.log(`Signal: Checking mentions for company: ${company.name}`);
             
             // Use RSS-based monitoring for this company
             try {
-                console.log(`FeedMonitor: Starting RSS monitoring for ${company.name}`);
+                console.log(`Signal: Starting RSS monitoring for ${company.name}`);
                 
                 // Get RSS results for this company
                 let mentions = await searchWithRSS(company);
@@ -414,7 +414,7 @@ async function checkForMentions() {
                     const isValid = isNotDuplicate && isRecent && isNotFuture && hasValidTitle && hasValidUrl;
                     
                     if (!isValid && isNotDuplicate) {
-                        console.log(`FeedMonitor: Filtered out mention - Recent: ${isRecent}, Valid Date: ${isValidDate}, Title: ${hasValidTitle}, URL: ${hasValidUrl}, Published: ${new Date(publishedDate).toISOString()}`);
+                        console.log(`Signal: Filtered out mention - Recent: ${isRecent}, Valid Date: ${isValidDate}, Title: ${hasValidTitle}, URL: ${hasValidUrl}, Published: ${new Date(publishedDate).toISOString()}`);
                     }
                     
                     return isValid;
@@ -439,13 +439,13 @@ async function checkForMentions() {
                 
                 newMentions.push(...companyMentions);
                 
-                console.log(`FeedMonitor: RSS monitoring found ${companyMentions.length} new mentions for ${company.name}`);
+                console.log(`Signal: RSS monitoring found ${companyMentions.length} new mentions for ${company.name}`);
                 
                 // Small delay before processing next company
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
             } catch (error) {
-                console.error(`FeedMonitor: Error in RSS monitoring for ${company.name}:`, error);
+                console.error(`Signal: Error in RSS monitoring for ${company.name}:`, error);
             }
         }
         
@@ -459,7 +459,7 @@ async function checkForMentions() {
                 lastCheckTime: Date.now()
             });
             
-            console.log(`FeedMonitor: Found ${newMentions.length} new mentions total`);
+            console.log(`Signal: Found ${newMentions.length} new mentions total`);
             
             // Notifications disabled per user request
             
@@ -472,14 +472,14 @@ async function checkForMentions() {
             });
             
         } else {
-            console.log('FeedMonitor: No new mentions found');
+            console.log('Signal: No new mentions found');
             
             // Update last check time
             await chrome.storage.local.set({ lastCheckTime: Date.now() });
         }
         
     } catch (error) {
-        console.error('FeedMonitor: Error checking mentions:', error);
+        console.error('Signal: Error checking mentions:', error);
         await chrome.storage.local.set({ lastCheckTime: Date.now() });
     }
 }
@@ -488,7 +488,7 @@ async function checkForMentions() {
 async function searchGNews(keyword) {
     // Skip GNews if no API key is configured
     if (!GNEWS_API_KEY || GNEWS_API_KEY === 'YOUR_GNEWS_API_KEY') {
-        console.log('FeedMonitor: GNews API key not configured, skipping');
+        console.log('Signal: GNews API key not configured, skipping');
         throw new Error('GNews API key not configured');
     }
     
@@ -539,7 +539,7 @@ async function searchGNews(keyword) {
                     const isNotFuture = article.publishedAt <= Date.now();
                     
                     if (!isRecent && isValidDate) {
-                        console.log(`FeedMonitor: GNews filtered old article: ${article.title} (${new Date(article.publishedAt).toISOString()})`);
+                        console.log(`Signal: GNews filtered old article: ${article.title} (${new Date(article.publishedAt).toISOString()})`);
                     }
                     
                     return isRecent && isValidDate && isNotFuture;
@@ -549,7 +549,7 @@ async function searchGNews(keyword) {
         return [];
         
     } catch (error) {
-        console.error('FeedMonitor: GNews API error:', error);
+        console.error('Signal: GNews API error:', error);
         return [];
     }
 }
@@ -559,22 +559,22 @@ async function searchWithRSS(company) {
     let allResults = [];
     
     try {
-        console.log(`FeedMonitor: Starting RSS monitoring for company: ${company.name}`);
-        console.log(`FeedMonitor: Company keywords:`, company.keywords);
+        console.log(`Signal: Starting RSS monitoring for company: ${company.name}`);
+        console.log(`Signal: Company keywords:`, company.keywords);
         
         // Generate RSS URLs for this company
         const rssUrls = generateRSSUrls(company);
-        console.log(`FeedMonitor: Generated ${rssUrls.length} RSS URLs for ${company.name}`);
+        console.log(`Signal: Generated ${rssUrls.length} RSS URLs for ${company.name}`);
         
         // Check each RSS feed
         for (let i = 0; i < rssUrls.length; i++) {
             const rssConfig = rssUrls[i];
             try {
-                console.log(`FeedMonitor: [${i + 1}/${rssUrls.length}] Fetching RSS feed for ${company.name}...`);
-                console.log(`FeedMonitor: RSS URL: ${rssConfig.url}`);
+                console.log(`Signal: [${i + 1}/${rssUrls.length}] Fetching RSS feed for ${company.name}...`);
+                console.log(`Signal: RSS URL: ${rssConfig.url}`);
                 
                 const feedResults = await fetchAndParseRSS(rssConfig, company);
-                console.log(`FeedMonitor: Feed ${i + 1} returned ${feedResults.length} results`);
+                console.log(`Signal: Feed ${i + 1} returned ${feedResults.length} results`);
                 
                 allResults.push(...feedResults);
                 
@@ -582,7 +582,7 @@ async function searchWithRSS(company) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
             } catch (error) {
-                console.error(`FeedMonitor: RSS feed ${i + 1} failed for ${company.name}:`, error);
+                console.error(`Signal: RSS feed ${i + 1} failed for ${company.name}:`, error);
             }
         }
         
@@ -590,11 +590,11 @@ async function searchWithRSS(company) {
         // Twitter RSS via Nitter is unreliable, so skip for now
         // Stick with the 3 working RSS sources
         
-        console.log(`FeedMonitor: RSS monitoring completed for ${company.name}. Total results: ${allResults.length}`);
+        console.log(`Signal: RSS monitoring completed for ${company.name}. Total results: ${allResults.length}`);
         return allResults;
         
     } catch (error) {
-        console.error(`FeedMonitor: RSS monitoring error for ${company.name}:`, error);
+        console.error(`Signal: RSS monitoring error for ${company.name}:`, error);
         return [];
     }
 }
@@ -644,7 +644,7 @@ function generateRSSUrls(company) {
         query: searchQuery + ' site:reddit.com'
     });
     
-    console.log(`FeedMonitor: Generated ${urls.length} RSS URLs for ${company.name} (ALL PLATFORMS):`);
+    console.log(`Signal: Generated ${urls.length} RSS URLs for ${company.name} (ALL PLATFORMS):`);
     console.log(`  - Google News: ${googleNewsUrl.substring(0, 80)}...`);
     console.log(`  - Podcast News: ${podcastNewsUrl.substring(0, 80)}...`);
     console.log(`  - YouTube: ${youtubeUrl.substring(0, 80)}...`);
@@ -656,7 +656,7 @@ function generateRSSUrls(company) {
 // Fetch podcasts from Podcast Index API
 async function fetchPodcastMentions(company) {
     try {
-        console.log(`FeedMonitor: Searching podcasts for ${company.name} via Podcast Index API`);
+        console.log(`Signal: Searching podcasts for ${company.name} via Podcast Index API`);
         
         const searchUrl = `${PODCAST_INDEX_API_URL}?q=${encodeURIComponent(company.name)}&max=20&fulltext=true`;
         
@@ -664,17 +664,17 @@ async function fetchPodcastMentions(company) {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'PR-Buddy-Chrome-Extension/1.0'
+                'User-Agent': 'Signal-Chrome-Extension/1.0'
             }
         });
         
         if (!response.ok) {
-            console.log(`FeedMonitor: Podcast API request failed: ${response.status}`);
+            console.log(`Signal: Podcast API request failed: ${response.status}`);
             return [];
         }
         
         const data = await response.json();
-        console.log(`FeedMonitor: Podcast API returned ${data.feeds?.length || 0} results`);
+        console.log(`Signal: Podcast API returned ${data.feeds?.length || 0} results`);
         
         if (!data.feeds || data.feeds.length === 0) {
             return [];
@@ -717,11 +717,11 @@ async function fetchPodcastMentions(company) {
             }
         });
         
-        console.log(`FeedMonitor: Found ${mentions.length} podcast mentions for ${company.name}`);
+        console.log(`Signal: Found ${mentions.length} podcast mentions for ${company.name}`);
         return mentions;
         
     } catch (error) {
-        console.error(`FeedMonitor: Error fetching podcast mentions for ${company.name}:`, error);
+        console.error(`Signal: Error fetching podcast mentions for ${company.name}:`, error);
         return [];
     }
 }
@@ -729,76 +729,76 @@ async function fetchPodcastMentions(company) {
 // Fetch and parse RSS feed
 async function fetchAndParseRSS(rssConfig, company) {
     try {
-        console.log(`FeedMonitor: Attempting to fetch RSS: ${rssConfig.url.substring(0, 100)}...`);
+        console.log(`Signal: Attempting to fetch RSS: ${rssConfig.url.substring(0, 100)}...`);
         
         const response = await fetch(rssConfig.url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/rss+xml, application/xml, text/xml',
-                'User-Agent': 'PR-Buddy-Chrome-Extension/1.0'
+                'User-Agent': 'Signal-Chrome-Extension/1.0'
             }
         });
         
-        console.log(`FeedMonitor: RSS response status: ${response.status}`);
-        console.log(`FeedMonitor: RSS response headers:`, Object.fromEntries(response.headers.entries()));
+        console.log(`Signal: RSS response status: ${response.status}`);
+        console.log(`Signal: RSS response headers:`, Object.fromEntries(response.headers.entries()));
         
         // Special handling for different RSS sources
         if (rssConfig.source === 'YouTube') {
-            console.log(`FeedMonitor: YouTube RSS URL: ${rssConfig.url}`);
-            console.log(`FeedMonitor: YouTube response status: ${response.status}`);
+            console.log(`Signal: YouTube RSS URL: ${rssConfig.url}`);
+            console.log(`Signal: YouTube response status: ${response.status}`);
         } else if (rssConfig.source === 'LinkedIn News') {
-            console.log(`FeedMonitor: LinkedIn News RSS URL: ${rssConfig.url}`);
-            console.log(`FeedMonitor: LinkedIn News response status: ${response.status}`);
-            console.log(`FeedMonitor: LinkedIn News response headers:`, Object.fromEntries(response.headers.entries()));
+            console.log(`Signal: LinkedIn News RSS URL: ${rssConfig.url}`);
+            console.log(`Signal: LinkedIn News response status: ${response.status}`);
+            console.log(`Signal: LinkedIn News response headers:`, Object.fromEntries(response.headers.entries()));
         } else if (rssConfig.source.includes('Podcast')) {
-            console.log(`FeedMonitor: PODCAST DEBUG - Source: ${rssConfig.source}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - URL: ${rssConfig.url}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - Response status: ${response.status}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - Response headers:`, Object.fromEntries(response.headers.entries()));
+            console.log(`Signal: PODCAST DEBUG - Source: ${rssConfig.source}`);
+            console.log(`Signal: PODCAST DEBUG - URL: ${rssConfig.url}`);
+            console.log(`Signal: PODCAST DEBUG - Response status: ${response.status}`);
+            console.log(`Signal: PODCAST DEBUG - Response headers:`, Object.fromEntries(response.headers.entries()));
         }
         
         if (!response.ok) {
             if (rssConfig.source === 'YouTube') {
-                console.log(`FeedMonitor: YouTube RSS failed with status ${response.status} - might not support search RSS`);
+                console.log(`Signal: YouTube RSS failed with status ${response.status} - might not support search RSS`);
             } else if (rssConfig.source === 'LinkedIn News') {
-                console.log(`FeedMonitor: LinkedIn News RSS failed with status ${response.status} - might require authentication or different URL`);
+                console.log(`Signal: LinkedIn News RSS failed with status ${response.status} - might require authentication or different URL`);
             } else if (rssConfig.source.includes('Podcast')) {
-                console.log(`FeedMonitor: PODCAST DEBUG - FAILED with status ${response.status}`);
-                console.log(`FeedMonitor: PODCAST DEBUG - Error: ${response.statusText}`);
-                console.log(`FeedMonitor: PODCAST DEBUG - This might indicate the RSS endpoint doesn't exist or requires authentication`);
+                console.log(`Signal: PODCAST DEBUG - FAILED with status ${response.status}`);
+                console.log(`Signal: PODCAST DEBUG - Error: ${response.statusText}`);
+                console.log(`Signal: PODCAST DEBUG - This might indicate the RSS endpoint doesn't exist or requires authentication`);
             }
             throw new Error(`RSS fetch failed: ${response.status} ${response.statusText}`);
         }
         
         const xmlText = await response.text();
-        console.log(`FeedMonitor: RSS XML length: ${xmlText.length} characters`);
-        console.log(`FeedMonitor: RSS XML preview: ${xmlText.substring(0, 200)}...`);
+        console.log(`Signal: RSS XML length: ${xmlText.length} characters`);
+        console.log(`Signal: RSS XML preview: ${xmlText.substring(0, 200)}...`);
         
         // Special handling for iTunes podcast search
         if (rssConfig.type === 'itunes_podcast_search') {
-            console.log(`FeedMonitor: PODCAST DEBUG - Processing iTunes API response`);
+            console.log(`Signal: PODCAST DEBUG - Processing iTunes API response`);
             const results = await parseItunesPodcastSearch(xmlText, company, rssConfig);
-            console.log(`FeedMonitor: Parsed ${results.length} podcast episodes from iTunes search`);
+            console.log(`Signal: Parsed ${results.length} podcast episodes from iTunes search`);
             return results;
         }
         
         // Special debugging for other podcast responses
         if (rssConfig.source.includes('Podcast')) {
-            console.log(`FeedMonitor: PODCAST DEBUG - SUCCESS! Got ${xmlText.length} characters`);
-            console.log(`FeedMonitor: PODCAST DEBUG - XML preview: ${xmlText.substring(0, 500)}...`);
-            console.log(`FeedMonitor: PODCAST DEBUG - Content type check: ${xmlText.includes('<?xml') ? 'Valid XML' : 'Not XML'}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - RSS check: ${xmlText.includes('<rss') || xmlText.includes('<feed') ? 'Contains RSS/Feed tags' : 'No RSS/Feed tags found'}`);
+            console.log(`Signal: PODCAST DEBUG - SUCCESS! Got ${xmlText.length} characters`);
+            console.log(`Signal: PODCAST DEBUG - XML preview: ${xmlText.substring(0, 500)}...`);
+            console.log(`Signal: PODCAST DEBUG - Content type check: ${xmlText.includes('<?xml') ? 'Valid XML' : 'Not XML'}`);
+            console.log(`Signal: PODCAST DEBUG - RSS check: ${xmlText.includes('<rss') || xmlText.includes('<feed') ? 'Contains RSS/Feed tags' : 'No RSS/Feed tags found'}`);
         }
         
         const results = parseRSSXML(xmlText, company, rssConfig.keywords, rssConfig);
         
-        console.log(`FeedMonitor: Parsed ${results.length} articles from RSS for ${company.name}`);
+        console.log(`Signal: Parsed ${results.length} articles from RSS for ${company.name}`);
         return results;
         
     } catch (error) {
-        console.error(`FeedMonitor: RSS fetch/parse error for ${company.name}:`, error);
+        console.error(`Signal: RSS fetch/parse error for ${company.name}:`, error);
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            console.error('FeedMonitor: This might be a CORS issue. RSS feeds might not be accessible from Chrome extension.');
+            console.error('Signal: This might be a CORS issue. RSS feeds might not be accessible from Chrome extension.');
         }
         return [];
     }
@@ -807,15 +807,15 @@ async function fetchAndParseRSS(rssConfig, company) {
 // Parse iTunes podcast search response and fetch actual podcast RSS feeds
 async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
     try {
-        console.log(`FeedMonitor: PODCAST - Parsing iTunes API response for ${company.name}`);
+        console.log(`Signal: PODCAST - Parsing iTunes API response for ${company.name}`);
         
         const data = JSON.parse(jsonText);
         const podcasts = data.results || [];
         
-        console.log(`FeedMonitor: PODCAST - Found ${podcasts.length} podcasts from iTunes search`);
+        console.log(`Signal: PODCAST - Found ${podcasts.length} podcasts from iTunes search`);
         
         if (podcasts.length === 0) {
-            console.log(`FeedMonitor: PODCAST - No podcasts found for ${company.name}`);
+            console.log(`Signal: PODCAST - No podcasts found for ${company.name}`);
             return [];
         }
         
@@ -828,35 +828,35 @@ async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
             const feedUrl = podcast.feedUrl;
             
             if (!feedUrl) {
-                console.log(`FeedMonitor: PODCAST - No RSS feed for podcast: ${podcast.trackName || podcast.collectionName}`);
+                console.log(`Signal: PODCAST - No RSS feed for podcast: ${podcast.trackName || podcast.collectionName}`);
                 continue;
             }
             
-            console.log(`FeedMonitor: PODCAST - Checking podcast: ${podcast.trackName || podcast.collectionName}`);
-            console.log(`FeedMonitor: PODCAST - RSS URL: ${feedUrl.substring(0, 80)}...`);
+            console.log(`Signal: PODCAST - Checking podcast: ${podcast.trackName || podcast.collectionName}`);
+            console.log(`Signal: PODCAST - RSS URL: ${feedUrl.substring(0, 80)}...`);
             
             try {
                 // Fetch the actual podcast RSS feed
                 const rssResponse = await fetch(feedUrl, {
                     headers: {
                         'Accept': 'application/rss+xml, application/xml, text/xml',
-                        'User-Agent': 'PR-Buddy-Chrome-Extension/1.0'
+                        'User-Agent': 'Signal-Chrome-Extension/1.0'
                     }
                 });
                 
                 if (!rssResponse.ok) {
-                    console.log(`FeedMonitor: PODCAST - RSS fetch failed for ${podcast.trackName}: ${rssResponse.status}`);
+                    console.log(`Signal: PODCAST - RSS fetch failed for ${podcast.trackName}: ${rssResponse.status}`);
                     continue;
                 }
                 
                 const rssXml = await rssResponse.text();
-                console.log(`FeedMonitor: PODCAST - RSS feed length: ${rssXml.length} characters`);
+                console.log(`Signal: PODCAST - RSS feed length: ${rssXml.length} characters`);
                 
                 // Parse the RSS feed for episodes
                 const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
                 const matches = [...rssXml.matchAll(itemRegex)];
                 
-                console.log(`FeedMonitor: PODCAST - Found ${matches.length} episodes in ${podcast.trackName}`);
+                console.log(`Signal: PODCAST - Found ${matches.length} episodes in ${podcast.trackName}`);
                 
                 // Check each episode for company mentions
                 for (let j = 0; j < Math.min(5, matches.length); j++) {
@@ -899,7 +899,7 @@ async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
                         const companyNameLower = company.name.toLowerCase();
                         
                         if (episodeContent.includes(companyNameLower)) {
-                            console.log(`FeedMonitor: PODCAST - ✅ FOUND MENTION: ${title.substring(0, 50)}...`);
+                            console.log(`Signal: PODCAST - ✅ FOUND MENTION: ${title.substring(0, 50)}...`);
                             
                             allEpisodes.push({
                                 title: title.trim(),
@@ -918,7 +918,7 @@ async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
                         }
                         
                     } catch (episodeError) {
-                        console.log(`FeedMonitor: PODCAST - Error parsing episode: ${episodeError.message}`);
+                        console.log(`Signal: PODCAST - Error parsing episode: ${episodeError.message}`);
                     }
                 }
                 
@@ -926,15 +926,15 @@ async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
             } catch (rssError) {
-                console.log(`FeedMonitor: PODCAST - Error fetching RSS for ${podcast.trackName}: ${rssError.message}`);
+                console.log(`Signal: PODCAST - Error fetching RSS for ${podcast.trackName}: ${rssError.message}`);
             }
         }
         
-        console.log(`FeedMonitor: PODCAST - Total relevant episodes found: ${allEpisodes.length}`);
+        console.log(`Signal: PODCAST - Total relevant episodes found: ${allEpisodes.length}`);
         return allEpisodes;
         
     } catch (error) {
-        console.error(`FeedMonitor: PODCAST - Error parsing iTunes response: ${error.message}`);
+        console.error(`Signal: PODCAST - Error parsing iTunes response: ${error.message}`);
         return [];
     }
 }
@@ -942,7 +942,7 @@ async function parseItunesPodcastSearch(jsonText, company, rssConfig) {
 // Parse RSS XML and extract article data (without DOM APIs)
 function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
     try {
-        console.log('FeedMonitor: Starting XML parsing without DOM APIs');
+        console.log('Signal: Starting XML parsing without DOM APIs');
         
         // Simple regex-based XML parsing for service worker context
         const articles = [];
@@ -954,20 +954,20 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
         const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/gi;
         
         let matches = [...xmlText.matchAll(itemRegex), ...xmlText.matchAll(entryRegex)];
-        console.log(`FeedMonitor: Found ${matches.length} items/entries using regex`);
-        console.log(`FeedMonitor: RSS source: ${rssConfig.source}`);
+        console.log(`Signal: Found ${matches.length} items/entries using regex`);
+        console.log(`Signal: RSS source: ${rssConfig.source}`);
         
         // Special debugging for YouTube
         if (rssConfig.source === 'YouTube') {
-            console.log(`FeedMonitor: YouTube XML preview: ${xmlText.substring(0, 500)}...`);
+            console.log(`Signal: YouTube XML preview: ${xmlText.substring(0, 500)}...`);
             const entriesFound = xmlText.match(entryRegex) || [];
-            console.log(`FeedMonitor: YouTube entries found: ${entriesFound.length}`);
+            console.log(`Signal: YouTube entries found: ${entriesFound.length}`);
             if (entriesFound.length === 0) {
-                console.log('FeedMonitor: No YouTube entries found - checking if feed exists');
+                console.log('Signal: No YouTube entries found - checking if feed exists');
                 if (xmlText.includes('<feed')) {
-                    console.log('FeedMonitor: YouTube feed structure detected but no entries');
+                    console.log('Signal: YouTube feed structure detected but no entries');
                 } else {
-                    console.log('FeedMonitor: YouTube feed structure not found - might be error response');
+                    console.log('Signal: YouTube feed structure not found - might be error response');
                 }
             }
         }
@@ -976,20 +976,20 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
         if (rssConfig.source.includes('Podcast')) {
             const itemsFound = xmlText.match(itemRegex) || [];
             const entriesFound = xmlText.match(entryRegex) || [];
-            console.log(`FeedMonitor: PODCAST DEBUG - Items found: ${itemsFound.length}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - Entries found: ${entriesFound.length}`);
-            console.log(`FeedMonitor: PODCAST DEBUG - Total matches: ${matches.length}`);
+            console.log(`Signal: PODCAST DEBUG - Items found: ${itemsFound.length}`);
+            console.log(`Signal: PODCAST DEBUG - Entries found: ${entriesFound.length}`);
+            console.log(`Signal: PODCAST DEBUG - Total matches: ${matches.length}`);
             
             if (matches.length === 0) {
-                console.log('FeedMonitor: PODCAST DEBUG - No items/entries found. Checking XML structure...');
+                console.log('Signal: PODCAST DEBUG - No items/entries found. Checking XML structure...');
                 if (xmlText.includes('<rss')) {
-                    console.log('FeedMonitor: PODCAST DEBUG - Valid RSS structure detected');
+                    console.log('Signal: PODCAST DEBUG - Valid RSS structure detected');
                 } else if (xmlText.includes('<feed')) {
-                    console.log('FeedMonitor: PODCAST DEBUG - Atom feed structure detected');
+                    console.log('Signal: PODCAST DEBUG - Atom feed structure detected');
                 } else if (xmlText.includes('<html')) {
-                    console.log('FeedMonitor: PODCAST DEBUG - Got HTML response instead of XML - endpoint might not be RSS');
+                    console.log('Signal: PODCAST DEBUG - Got HTML response instead of XML - endpoint might not be RSS');
                 } else {
-                    console.log('FeedMonitor: PODCAST DEBUG - Unknown response format');
+                    console.log('Signal: PODCAST DEBUG - Unknown response format');
                 }
             }
         }
@@ -1031,7 +1031,7 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
                 
                 // Debug date parsing for first few items
                 if (i < 3) {
-                    console.log(`FeedMonitor: Date parsing for item ${i + 1}:`);
+                    console.log(`Signal: Date parsing for item ${i + 1}:`);
                     console.log(`  Raw item content (first 200 chars): "${itemContent.substring(0, 200)}"`);
                     console.log(`  Raw date string: "${dateStr}"`);
                     console.log(`  Parsed publishedAt: ${publishedAt} (${new Date(publishedAt).toISOString()})`);
@@ -1050,7 +1050,7 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
                 // Filter for recent articles only (14 days to match Google News RSS)
                 if (publishedAt < fourteenDaysAgo) {
                     if (i < 3) {
-                        console.log(`FeedMonitor: Item ${i + 1} filtered out due to old date`);
+                        console.log(`Signal: Item ${i + 1} filtered out due to old date`);
                     }
                     continue;
                 }
@@ -1093,7 +1093,7 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
                 
                 // Debug individual item parsing
                 if (articles.length < 3) {
-                    console.log(`FeedMonitor: Parsing item ${articles.length + 1}:`);
+                    console.log(`Signal: Parsing item ${articles.length + 1}:`);
                     console.log(`  Title: ${title.substring(0, 50)}...`);
                     console.log(`  Link: ${link.substring(0, 50)}...`);
                     console.log(`  Has relevant content: ${hasRelevantContent}`);
@@ -1129,19 +1129,19 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
                         
                         // Debug log for first few successful additions
                         if (articles.length <= 3) {
-                            console.log(`FeedMonitor: Successfully added article ${articles.length}: ${title.substring(0, 50)}...`);
+                            console.log(`Signal: Successfully added article ${articles.length}: ${title.substring(0, 50)}...`);
                             if (isPodcastSource || hasPodcastKeywords) {
-                                console.log(`FeedMonitor: ✅ PODCAST CONTENT DETECTED AND ADDED!`);
+                                console.log(`Signal: ✅ PODCAST CONTENT DETECTED AND ADDED!`);
                             }
                         }
                     } catch (addError) {
-                        console.error('FeedMonitor: Error adding article to array:', addError.message);
-                        console.error('FeedMonitor: Article details - Title:', title.substring(0, 50), 'Link:', link.substring(0, 50));
+                        console.error('Signal: Error adding article to array:', addError.message);
+                        console.error('Signal: Article details - Title:', title.substring(0, 50), 'Link:', link.substring(0, 50));
                     }
                 }
                 
             } catch (itemError) {
-                console.log('FeedMonitor: Error parsing RSS item:', itemError.message);
+                console.log('Signal: Error parsing RSS item:', itemError.message);
             }
         }
         
@@ -1151,7 +1151,7 @@ function parseRSSXML(xmlText, company, matchedKeywords, rssConfig) {
         return articles.slice(0, MAX_RSS_RESULTS_PER_FEED);
         
     } catch (error) {
-        console.error('FeedMonitor: RSS XML parsing error:', error);
+        console.error('Signal: RSS XML parsing error:', error);
         return [];
     }
 }
@@ -1228,7 +1228,7 @@ function cleanDescription(description) {
 // Google Custom Search API
 async function searchGoogleCustom(keyword) {
     if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'YOUR_GOOGLE_API_KEY') {
-        console.log('FeedMonitor: Google API key not configured, skipping');
+        console.log('Signal: Google API key not configured, skipping');
         throw new Error('Google API key not configured');
     }
     
@@ -1284,7 +1284,7 @@ async function searchGoogleCustom(keyword) {
                 // Final validation - only return items from last 24 hours
                 const isRecent = item.publishedAt > twentyFourHoursAgo;
                 if (!isRecent) {
-                    console.log(`FeedMonitor: Google filtered old result: ${item.title} (${new Date(item.publishedAt).toISOString()})`);
+                    console.log(`Signal: Google filtered old result: ${item.title} (${new Date(item.publishedAt).toISOString()})`);
                 }
                 return isRecent;
             });
@@ -1293,7 +1293,7 @@ async function searchGoogleCustom(keyword) {
         return [];
         
     } catch (error) {
-        console.error('FeedMonitor: Google Custom Search error:', error);
+        console.error('Signal: Google Custom Search error:', error);
         return [];
     }
 }
@@ -1317,7 +1317,7 @@ async function searchAlternativeNews(keyword) {
         return results.slice(0, 10); // Limit results
         
     } catch (error) {
-        console.error('FeedMonitor: Alternative news search error:', error);
+        console.error('Signal: Alternative news search error:', error);
         return [];
     }
 }
@@ -1355,7 +1355,7 @@ async function searchReddit(keyword) {
                     const isNotFuture = post.publishedAt <= Date.now();
                     
                     if (!isRecent && isValidDate) {
-                        console.log(`FeedMonitor: Reddit filtered old post: ${post.title} (${new Date(post.publishedAt).toISOString()})`);
+                        console.log(`Signal: Reddit filtered old post: ${post.title} (${new Date(post.publishedAt).toISOString()})`);
                     }
                     
                     return isRecent && isValidDate && isNotFuture;
@@ -1365,7 +1365,7 @@ async function searchReddit(keyword) {
         return [];
         
     } catch (error) {
-        console.error('FeedMonitor: Reddit search error:', error);
+        console.error('Signal: Reddit search error:', error);
         return [];
     }
 }
@@ -1375,11 +1375,11 @@ async function searchSocialMentions(keyword) {
     try {
         // Disabled to prevent fake/old results
         // Only return real results from actual APIs with verified timestamps
-        console.log(`FeedMonitor: Social media search disabled for "${keyword}" to prevent fake results`);
+        console.log(`Signal: Social media search disabled for "${keyword}" to prevent fake results`);
         return [];
         
     } catch (error) {
-        console.error('FeedMonitor: Social mentions search error:', error);
+        console.error('Signal: Social mentions search error:', error);
         return [];
     }
 }
@@ -1401,13 +1401,13 @@ function cleanupOldMentions(mentions) {
     const cleaned = mentions.filter(mention => {
         const isRecent = mention.publishedAt > sevenDaysAgo;
         if (!isRecent) {
-            console.log(`FeedMonitor: Cleaned up old mention: ${mention.title} (${new Date(mention.publishedAt).toISOString()})`);
+            console.log(`Signal: Cleaned up old mention: ${mention.title} (${new Date(mention.publishedAt).toISOString()})`);
         }
         return isRecent;
     });
     
     if (cleaned.length !== mentions.length) {
-        console.log(`FeedMonitor: Cleaned up ${mentions.length - cleaned.length} old mentions`);
+        console.log(`Signal: Cleaned up ${mentions.length - cleaned.length} old mentions`);
     }
     
     return cleaned;
@@ -1450,9 +1450,9 @@ async function generateTestResults(keyword) {
             });
         }
         
-        console.log(`FeedMonitor: TEST MODE generated ${testResults.length} sample results for "${keyword}"`);
+        console.log(`Signal: TEST MODE generated ${testResults.length} sample results for "${keyword}"`);
     } else {
-        console.log(`FeedMonitor: TEST MODE - No results generated for "${keyword}" (simulating real-world sparsity)`);
+        console.log(`Signal: TEST MODE - No results generated for "${keyword}" (simulating real-world sparsity)`);
     }
     
     return testResults;
@@ -1487,4 +1487,4 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     });
 });
 
-console.log('FeedMonitor: Background script setup complete');
+console.log('Signal: Background script setup complete');

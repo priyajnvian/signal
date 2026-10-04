@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Feed Monitor",
-  "version": "1.0.0",
-  "description": "Monitor brand and keyword mentions across Google News, YouTube, Reddit and podcast feeds. Runs on RSS, no API key required.",
+  "name": "Signal by ELI",
+  "version": "1.0",
+  "description": "Instant notifications when your clients get mentioned in the media",
   "permissions": [
     "storage",
     "alarms",
@@ -14,7 +14,7 @@
     "https://*/*"
   ],
   "action": {
-    "default_title": "Feed Monitor - Open Dashboard",
+    "default_title": "Signal by ELI - Open Dashboard",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

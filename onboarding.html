@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal by ELI - Setup</title>
+    <link rel="stylesheet" href="onboarding.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Signal by ELI</h1>
+            <p>Get personalized media mentions based on your professional profile</p>
+        </header>
+
+        <div id="step1" class="step active">
+            <div class="step-content">
+                <h2>Welcome! Let's personalize your media monitoring</h2>
+                <p>To show you the most relevant media mentions, we need to understand your professional background.</p>
+                
+                <div class="feature-list">
+                    <div class="feature">
+                        <span class="icon">🎯</span>
+                        <div>
+                            <h3>Targeted Content</h3>
+                            <p>Get media mentions relevant to your industry and role</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">📊</span>
+                        <div>
+                            <h3>Smart Filtering</h3>
+                            <p>Stories filtered by your seniority level and interests</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">⚡</span>
+                        <div>
+                            <h3>Quick Setup</h3>
+                            <p>One-time LinkedIn profile analysis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-setup" class="primary-btn">Get Started</button>
+            </div>
+        </div>
+
+        <div id="step2" class="step">
+            <div class="step-content">
+                <h2>Connect Your LinkedIn Profile</h2>
+                <p>We'll analyze your public LinkedIn profile to understand your professional context.</p>
+                
+                <div class="linkedin-setup">
+                    <div class="privacy-note">
+                        <span class="icon">🔒</span>
+                        <div>
+                            <h3>Privacy First</h3>
+                            <p>Your data stays local. We only read your public profile information to personalize news.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="steps-list">
+                        <div class="setup-step">
+                            <span class="step-number">1</span>
+                            <p>Open your LinkedIn profile in a new tab</p>
+                        </div>
+                        <div class="setup-step">
+                            <span class="step-number">2</span>
+                            <p>Click "Scan My Profile" below</p>
+                        </div>
+                        <div class="setup-step">
+                            <span class="step-number">3</span>
+                            <p>Switch to your LinkedIn tab</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="open-linkedin" class="secondary-btn">Open LinkedIn Profile</button>
+                    <button id="scan-profile" class="primary-btn" disabled>Scan My Profile</button>
+                </div>
+                
+                <button id="skip-linkedin" class="text-btn">Skip for now (manual setup)</button>
+            </div>
+        </div>
+
+        <div id="step3" class="step">
+            <div class="step-content">
+                <h2>Scanning Your Profile...</h2>
+                
+                <div class="scanning-animation">
+                    <div class="spinner"></div>
+                    <p id="scanning-status">Analyzing your LinkedIn profile...</p>
+                </div>
+                
+                <div class="scanning-steps">
+                    <div class="scan-step" id="scan-basic">
+                        <span class="check-icon">⏳</span>
+                        <span>Reading basic information</span>
+                    </div>
+                    <div class="scan-step" id="scan-experience">
+                        <span class="check-icon">⏳</span>
+                        <span>Analyzing work experience</span>
+                    </div>
+                    <div class="scan-step" id="scan-skills">
+                        <span class="check-icon">⏳</span>
+                        <span>Understanding your skills</span>
+                    </div>
+                    <div class="scan-step" id="scan-context">
+                        <span class="check-icon">⏳</span>
+                        <span>Building your profile context</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step4" class="step">
+            <div class="step-content">
+                <h2>Profile Analysis Complete!</h2>
+                
+                <div id="profile-summary" class="profile-card">
+                    <!-- Profile details will be inserted here -->
+                </div>
+                
+                <div class="personalization-preview">
+                    <h3>Your Mentions Will Focus On:</h3>
+                    <div id="focus-areas" class="focus-list">
+                        <!-- Focus areas will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="edit-profile" class="secondary-btn">Edit Details</button>
+                    <button id="finish-setup" class="primary-btn">Start Getting Personalized News</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="step5" class="step">
+            <div class="step-content">
+                <h2>Manual Profile Setup</h2>
+                <p>Help us understand your professional background to personalize your media monitoring.</p>
+                
+                <form id="manual-profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label for="job-function">What best describes your role?</label>
+                        <select id="job-function" required>
+                            <option value="">Select your role...</option>
+                            <option value="technical">Technical (Engineer, Developer, Data Scientist)</option>
+                            <option value="business">Business (Strategy, Operations, Consulting)</option>
+                            <option value="product">Product (PM, UX/UI, Design)</option>
+                            <option value="marketing">Marketing (Growth, Digital, Content)</option>
+                            <option value="sales">Sales (Account Management, Business Development)</option>
+                            <option value="finance">Finance (Investment, Accounting, CFO)</option>
+                            <option value="hr">HR (People, Talent, Recruitment)</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seniority">Your seniority level?</label>
+                        <select id="seniority" required>
+                            <option value="">Select level...</option>
+                            <option value="junior">Junior (0-2 years experience)</option>
+                            <option value="mid">Mid-level (3-7 years experience)</option>
+                            <option value="senior">Senior (8+ years or leadership role)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">Which industry do you work in?</label>
+                        <select id="industry" required>
+                            <option value="">Select industry...</option>
+                            <option value="technology">Technology/Software</option>
+                            <option value="finance">Finance/Banking</option>
+                            <option value="healthcare">Healthcare/Medical</option>
+                            <option value="consulting">Consulting</option>
+                            <option value="education">Education</option>
+                            <option value="retail">Retail/E-commerce</option>
+                            <option value="manufacturing">Manufacturing</option>
+                            <option value="media">Media/Entertainment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interests">AI topics you're most interested in: (optional)</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="machine-learning"> Machine Learning</label>
+                            <label><input type="checkbox" value="generative-ai"> Generative AI</label>
+                            <label><input type="checkbox" value="business-ai"> AI in Business</label>
+                            <label><input type="checkbox" value="ai-ethics"> AI Ethics</label>
+                            <label><input type="checkbox" value="ai-tools"> AI Tools & Productivity</label>
+                            <label><input type="checkbox" value="ai-research"> AI Research</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Save Profile & Continue</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="step-indicator">
+            <span id="step-text">Step 1 of 4</span>
+        </div>
+    </div>
+    
+    <script src="onboarding.js"></script>
+</body>
+</html>

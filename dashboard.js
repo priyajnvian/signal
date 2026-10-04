@@ -1,7 +1,7 @@
-// FeedMonitor - Dashboard JavaScript
+// Signal by ELI - Dashboard JavaScript
 console.log('Signal Dashboard: Script loaded');
 
-class PRBuddyDashboard {
+class SignalDashboard {
     constructor() {
         console.log('Signal Dashboard: Initializing...');
         
@@ -1329,7 +1329,7 @@ class PRBuddyDashboard {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Signal Dashboard: DOM loaded, initializing dashboard');
     try {
-        new PRBuddyDashboard();
+        new SignalDashboard();
     } catch (error) {
         console.error('Signal Dashboard: Failed to initialize:', error);
     }
