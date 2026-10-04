@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed Monitor</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" href="icons/icon32.png" type="image/png">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <div class="brand-logo">📡</div>
+            <h1>Feed Monitor</h1>
+        </div>
+        <div class="nav-actions">
+            <button id="add-company-btn" class="nav-btn" title="Add New Company">
+                <span class="btn-icon">🏢</span>
+                <span class="btn-text">Add Company</span>
+            </button>
+            <button id="refresh-all-btn" class="nav-btn" title="Refresh All Monitoring">
+                <span class="btn-icon">🔄</span>
+                <span class="btn-text">Refresh</span>
+            </button>
+            <div class="monitoring-status">
+                <div class="status-indicator active" id="monitoring-indicator"></div>
+                <span id="monitoring-status-text">Monitoring Active</span>
+                <span id="last-update-time">Last check: --</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Loading State -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Checking for new mentions...</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div id="dashboard" class="dashboard-grid">
+            <!-- Empty state for no companies -->
+            <div id="no-companies" class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-icon">🏢</div>
+                <h3>No companies added yet</h3>
+                <p>Start monitoring media mentions by using the "Add Company" button above</p>
+            </div>
+            
+            <!-- Company-Specific Mentions Sections (will be dynamically generated) -->
+            <div id="company-mentions-container"></div>
+
+
+        </div>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div id="add-company-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Company</h3>
+                <button id="close-modal" class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="company-name">Company Name *</label>
+                    <input type="text" id="company-name" placeholder="e.g., Acme Inc." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-company" class="btn-secondary">Cancel</button>
+                <button id="save-company" class="btn-primary">Save Company</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="footer-content">
+            <div class="footer-status">
+                <span class="status-icon">📡</span>
+                <span>Last check: <span id="last-check-time">--</span></span>
+            </div>
+            <div class="footer-info">
+                <span>Feed Monitor v1.0.0 • Multi-Platform Monitoring (News + YouTube + Reddit + Podcast News)</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
